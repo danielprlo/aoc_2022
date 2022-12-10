@@ -2,55 +2,70 @@ data_stream = open('input.txt', 'r').readlines()
 
 
 def main():
-    visible = 0
-    matrix = [line.strip() for line in data_stream]
-    max_tree = 0
+    snake = [
+        {'x': 50000, 'y': 50000},
+        {'x': 50000, 'y': 50000},
+        {'x': 50000, 'y': 50000},
+        {'x': 50000, 'y': 50000},
+        {'x': 50000, 'y': 50000},
+        {'x': 50000, 'y': 50000},
+        {'x': 50000, 'y': 50000},
+        {'x': 50000, 'y': 50000},
+        {'x': 50000, 'y': 50000},
+        {'x': 50000, 'y': 50000},
+        {'x': 50000, 'y': 50000}
+    ]
+    visited = {}
 
-    for i, forest in enumerate(matrix):
-        for j, tree in enumerate(forest):
-            show = False
-            if matrix[i][j] == '6':
-                show = True
+    for line in data_stream:
+        print(line)
+        moves = line.strip('\n').split(' ')
+        for step in range(0, int(moves[1])):
+            ## Move head
+            if moves[0] == 'U':
+                snake[0]['y'] += 1
+            elif moves[0] == 'D':
+                snake[0]['y'] -= 1
+            elif moves[0] == 'R':
+                snake[0]['x'] += 1
+            else:
+                snake[0]['x'] -= 1
 
-            if show: print(matrix[i][j])
-            ## top
-            max_tree_top = 0
-            for x in range(i-1, -1, -1):
-                if matrix[i][j] <= matrix[x][j]:
-                    max_tree_top += 1
-                    break
-                max_tree_top += 1
-            ## bottom
-            max_tree_bottom = 0
-            for x in range(i+1, len(forest)):
-                if matrix[i][j] <= matrix[x][j]:
-                    max_tree_bottom += 1
-                    break
-                max_tree_bottom += 1
-            ## left
-            max_tree_left = 0
-            for x in range(j-1, -1, -1):
-                if show: print('here', i, j, x)
-                if matrix[i][j] <= matrix[i][x]:
-                    max_tree_left += 1
-                    break
-                max_tree_left += 1
+            for i in range(0,10):
+                ##Move tail
+                distance_x = abs(snake[i]['x']) - abs(snake[i+1]['x'])
+                distance_y = abs(snake[i]['y']) - abs(snake[i+1]['y'])
 
-            ## right
-            max_tree_right = 0
-            for x in range(j+1, len(forest)):
-                if matrix[i][j] <= matrix[i][x]:
-                    max_tree_right += 1
-                    break
-                max_tree_right += 1
+                if abs(distance_x) > 1 or abs(distance_y) > 1:
+                    ## move right
+                    if distance_x == 2 and distance_y == 0:
+                        snake[i+1]['x'] += 1
+                    ## move left
+                    elif distance_x == -2 and distance_y == 0:
+                        snake[i+1]['x'] -= 1
+                    ## move up
+                    elif distance_y == 2 and distance_x == 0:
+                        snake[i+1]['y'] += 1
+                    ## move down
+                    elif distance_y == -2 and distance_x == 0:
+                        snake[i+1]['y'] -= 1
+                    elif distance_x > 0 and distance_y > 0:
+                        snake[i+1]['x'] += 1
+                        snake[i+1]['y'] += 1
+                    elif distance_x < 0 and distance_y > 0:
+                        snake[i+1]['x'] -= 1
+                        snake[i+1]['y'] += 1
+                    elif distance_x < 0 and distance_y < 0:
+                        snake[i+1]['x'] -= 1
+                        snake[i+1]['y'] -= 1
+                    else:
+                        snake[i+1]['x'] += 1
+                        snake[i+1]['y'] -= 1
+                if i == 9:
+                    visited[str(snake[i+1]['x']) + str(snake[i+1]['y'])] = True
 
-            total_count_tree = max_tree_left * max_tree_right * max_tree_top * max_tree_bottom
-            if show:
-                print(max_tree_left, max_tree_right, max_tree_top, max_tree_bottom)
-            if total_count_tree > max_tree:
-                max_tree = total_count_tree
-
-    print(max_tree)
+    print(snake)
+    print(len(visited.keys())+1)
 
 
 if __name__ == "__main__":
